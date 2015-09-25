@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.content.WakefulBroadcastReceiver;
+//import android.support.v4.content.WakefulBroadcastReceiver;
 
 import org.chromium.base.Log;
 import org.chromium.base.ThreadUtils;
@@ -33,8 +33,8 @@ public class BackgroundSyncLauncherService extends IntentService {
      *
      * This class is public so that it can be instantiated by the Android runtime.
      */
-    public static class Receiver extends WakefulBroadcastReceiver {
-        @Override
+    public static class Receiver {
+//        @Override
         public void onReceive(Context context, Intent intent) {
             // If online, the browser isn't running, and the browser has requested
             // it be launched the next time the device is online, start the browser.
@@ -47,7 +47,7 @@ public class BackgroundSyncLauncherService extends IntentService {
         @VisibleForTesting
         protected void startService(Context context) {
             Intent serviceIntent = new Intent(context, BackgroundSyncLauncherService.class);
-            startWakefulService(context, serviceIntent);
+//          startWakefulService(context, serviceIntent);
         }
 
         @VisibleForTesting
@@ -73,7 +73,7 @@ public class BackgroundSyncLauncherService extends IntentService {
                 }
             });
         } finally {
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
+//            WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
     }
 
