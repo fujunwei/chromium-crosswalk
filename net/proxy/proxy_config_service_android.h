@@ -6,6 +6,7 @@
 #define NET_PROXY_PROXY_CONFIG_SERVICE_ANDROID_H_
 
 #include <string>
+#include <vector>
 
 #include "base/android/jni_android.h"
 #include "base/basictypes.h"
@@ -75,6 +76,14 @@ class NET_EXPORT ProxyConfigServiceAndroid : public ProxyConfigService {
   void RemoveObserver(Observer* observer) override;
   ConfigAvailability GetLatestProxyConfig(ProxyConfig* config) override;
 
+  void ProxySettingsChanged();
+
+  void ProxySettingsChangedTo(
+      const std::string& host,
+      int port,
+      const std::string& pac_url,
+      const std::vector<std::string>& exclusion_list);
+
  private:
   friend class ProxyConfigServiceAndroidTestBase;
   class Delegate;
@@ -84,9 +93,6 @@ class NET_EXPORT ProxyConfigServiceAndroid : public ProxyConfigService {
       const scoped_refptr<base::SequencedTaskRunner>& network_task_runner,
       const scoped_refptr<base::SequencedTaskRunner>& jni_task_runner,
       GetPropertyCallback get_property_callback);
-
-  // For tests.
-  void ProxySettingsChanged();
 
   scoped_refptr<Delegate> delegate_;
 
