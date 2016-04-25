@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
 * A wrapper around android.media.MediaPlayer that allows the native code to use it.
@@ -37,7 +39,7 @@ public class MediaPlayerBridge {
 
     public static class ResourceLoadingFilter {
         public boolean shouldOverrideResourceLoading(
-                MediaPlayer mediaPlayer, Context context, Uri uri) {
+                MediaPlayer mediaPlayer, Context context, Uri uri, Map<String, String> headers) {
             return false;
         }
     }
@@ -150,14 +152,49 @@ public class MediaPlayerBridge {
         getLocalPlayer().seekTo(msec);
     }
 
+    final String LOCAL_ADDRESS = "http://127.0.0.1";
+    final int LOCAL_PORT = 8123;
+    final String LOCAL_IP_ADDRESS = "127.0.0.1:8123";
+
     @CalledByNative
     protected boolean setDataSource(
             Context context, String url, String cookies, String userAgent, boolean hideUrlLog) {
+        Log.d("fujunwei",  "======in setDataSource 3 before " + url);
+        //playUrl = String.format(Locale.US, "http://127.0.0.1:%d/%s", 8123, url);
+/*      String LOCAL_IP_ADDRESS = "127.0.0.1:8123";
+        URI originalURI = URI.create(url);
+        String remoteHost = originalURI.getHost();
+        if(originalURI.getPort() != -1) {//URL带Port
+            playUrl = url.replace(remoteHost+":"+originalURI.getPort(), LOCAL_IP_ADDRESS);
+        } else {
+            playUrl = url.replace(remoteHost,LOCAL_IP_ADDRESS);
+        } 
+*/
+/*        String remoteHost = "";
+        int remotePort = -1;
+        if ((!TextUtils.isEmpty(url)) && (!url.startsWith(LOCAL_ADDRESS)) && (url.startsWith("http://"))) {
+//            StringBuilder localUrl = new StringBuilder().append(LOCAL_ADDRESS);
+//            localUrl.append(":").append(LOCAL_PORT).append("/").append(url.substring(7));
+//            url = localUrl.toString();
+             URI originalURI = URI.create(url);
+             remoteHost = originalURI.getHost();
+             remotePort = originalURI.getPort();
+             if(remotePort != -1) {//URL带Port
+                 url = url.replace(remoteHost+":"+remotePort, LOCAL_IP_ADDRESS);
+             } else {
+                 url = url.replace(remoteHost, LOCAL_IP_ADDRESS);
+             }
+        }
+        Log.d("fujunwei",  "======in setDataSource end " + url);
+*/
         Uri uri = Uri.parse(url);
+
         HashMap<String, String> headersMap = new HashMap<String, String>();
         if (hideUrlLog) headersMap.put("x-hide-urls-from-log", "true");
         if (!TextUtils.isEmpty(cookies)) headersMap.put("Cookie", cookies);
         if (!TextUtils.isEmpty(userAgent)) headersMap.put("User-Agent", userAgent);
+//        headersMap.put("Remote-Host", remoteHost);
+//        headersMap.put("Remote-Port", "" + remotePort);
         // The security origin check is enforced for devices above K. For devices below K,
         // only anonymous media HTTP request (no cookies) may be considered same-origin.
         // Note that if the server rejects the request we must not consider it same-origin.
@@ -167,7 +204,7 @@ public class MediaPlayerBridge {
         try {
             if (sResourceLoadFilter != null &&
                     sResourceLoadFilter.shouldOverrideResourceLoading(
-                            getLocalPlayer(), context, uri)) {
+                            getLocalPlayer(), context, uri, headersMap)) {
                 return true;
             }
             getLocalPlayer().setDataSource(context, uri, headersMap);
