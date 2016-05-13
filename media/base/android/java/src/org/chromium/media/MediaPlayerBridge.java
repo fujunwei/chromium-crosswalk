@@ -39,8 +39,12 @@ public class MediaPlayerBridge {
 
     public static class ResourceLoadingFilter {
         public boolean shouldOverrideResourceLoading(
-                MediaPlayer mediaPlayer, Context context, Uri uri, Map<String, String> headers) {
+                ExMediaPlayer mediaPlayer, Context context, Uri uri, Map<String, String> headers) {
             return false;
+        }
+
+        public ExMediaPlayer getExMediaPlayer() {
+            return null;
         }
     }
 
@@ -55,7 +59,7 @@ public class MediaPlayerBridge {
     // Local player to forward this to. We don't initialize it here since the subclass might not
     // want it.
     private LoadDataUriTask mLoadDataUriTask;
-    private MediaPlayer mPlayer;
+    private ExMediaPlayer mExMediaPlayer;
     private long mNativeMediaPlayerBridge;
 
     @CalledByNative
@@ -79,22 +83,24 @@ public class MediaPlayerBridge {
         mNativeMediaPlayerBridge = 0;
     }
 
-    protected MediaPlayer getLocalPlayer() {
-        if (mPlayer == null) {
-            mPlayer = new MediaPlayer();
+    protected ExMediaPlayer getExMediaPlayer() {
+        if (mExMediaPlayer == null) {
+            mExMediaPlayer = sResourceLoadFilter.getExMediaPlayer();//new ExMediaPlayer();//
         }
-        return mPlayer;
+        return mExMediaPlayer;
     }
 
     @CalledByNative
     protected void setSurface(Surface surface) {
-        getLocalPlayer().setSurface(surface);
+       getExMediaPlayer().setSurface(surface);
+       Log.e(TAG, "====setSurface .");
     }
 
     @CalledByNative
     protected boolean prepareAsync() {
+        Log.e(TAG, "====prepareAsync .");
         try {
-            getLocalPlayer().prepareAsync();
+            getExMediaPlayer().prepareAsync();
         } catch (IllegalStateException e) {
             Log.e(TAG, "Unable to prepare MediaPlayer.", e);
             return false;
@@ -104,52 +110,61 @@ public class MediaPlayerBridge {
 
     @CalledByNative
     protected boolean isPlaying() {
-        return getLocalPlayer().isPlaying();
+        Log.e(TAG, "====isPlaying ." + getExMediaPlayer().isPlaying());
+        return getExMediaPlayer().isPlaying();
     }
 
     @CalledByNative
     protected int getVideoWidth() {
-        return getLocalPlayer().getVideoWidth();
+        Log.e(TAG, "====getVideoWidth ." + getExMediaPlayer().getVideoWidth());
+        return getExMediaPlayer().getVideoWidth();
     }
 
     @CalledByNative
     protected int getVideoHeight() {
-        return getLocalPlayer().getVideoHeight();
+        Log.e(TAG, "====getVideoHeight ." + getExMediaPlayer().getVideoHeight());
+        return getExMediaPlayer().getVideoHeight();
     }
 
     @CalledByNative
     protected int getCurrentPosition() {
-        return getLocalPlayer().getCurrentPosition();
+        Log.e(TAG, "====getCurrentPosition ." + getExMediaPlayer().getCurrentPosition());
+        return getExMediaPlayer().getCurrentPosition();
     }
 
     @CalledByNative
     protected int getDuration() {
-        return getLocalPlayer().getDuration();
+        Log.e(TAG, "====getDuration ." + getExMediaPlayer().getDuration());
+        return getExMediaPlayer().getDuration();
     }
 
     @CalledByNative
     protected void release() {
-        getLocalPlayer().release();
+        Log.e(TAG, "====release .");
+        getExMediaPlayer().release();
     }
 
     @CalledByNative
     protected void setVolume(double volume) {
-        getLocalPlayer().setVolume((float) volume, (float) volume);
+        getExMediaPlayer().setVolume((float) volume, (float) volume);
     }
 
     @CalledByNative
     protected void start() {
-        getLocalPlayer().start();
+        Log.e(TAG, "====start .");
+        getExMediaPlayer().start();
     }
 
     @CalledByNative
     protected void pause() {
-        getLocalPlayer().pause();
+        Log.e(TAG, "====pause .");
+        getExMediaPlayer().pause();
     }
 
     @CalledByNative
     protected void seekTo(int msec) throws IllegalStateException {
-        getLocalPlayer().seekTo(msec);
+        Log.e(TAG, "====seekTo ." + msec);
+        getExMediaPlayer().seekTo(msec);
     }
 
     final String LOCAL_ADDRESS = "http://127.0.0.1";
@@ -204,10 +219,10 @@ public class MediaPlayerBridge {
         try {
             if (sResourceLoadFilter != null &&
                     sResourceLoadFilter.shouldOverrideResourceLoading(
-                            getLocalPlayer(), context, uri, headersMap)) {
+                            getExMediaPlayer(), context, uri, headersMap)) {
                 return true;
             }
-            getLocalPlayer().setDataSource(context, uri, headersMap);
+            getExMediaPlayer().setDataSource(context, uri, headersMap);
             return true;
         } catch (Exception e) {
             return false;
@@ -218,7 +233,7 @@ public class MediaPlayerBridge {
     protected boolean setDataSourceFromFd(int fd, long offset, long length) {
         try {
             ParcelFileDescriptor parcelFd = ParcelFileDescriptor.adoptFd(fd);
-            getLocalPlayer().setDataSource(parcelFd.getFileDescriptor(), offset, length);
+            getExMediaPlayer().setDataSource(parcelFd.getFileDescriptor(), offset, length);
             parcelFd.close();
             return true;
         } catch (IOException e) {
@@ -294,7 +309,7 @@ public class MediaPlayerBridge {
             }
 
             try {
-                getLocalPlayer().setDataSource(mContext, Uri.fromFile(mTempFile));
+                getExMediaPlayer().setDataSource(mContext, Uri.fromFile(mTempFile));
             } catch (IOException e) {
                 result = false;
             }
@@ -315,27 +330,27 @@ public class MediaPlayerBridge {
     }
 
     protected void setOnBufferingUpdateListener(MediaPlayer.OnBufferingUpdateListener listener) {
-        getLocalPlayer().setOnBufferingUpdateListener(listener);
+        getExMediaPlayer().setOnBufferingUpdateListener(listener);
     }
 
     protected void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
-        getLocalPlayer().setOnCompletionListener(listener);
+        getExMediaPlayer().setOnCompletionListener(listener);
     }
 
     protected void setOnErrorListener(MediaPlayer.OnErrorListener listener) {
-        getLocalPlayer().setOnErrorListener(listener);
+        getExMediaPlayer().setOnErrorListener(listener);
     }
 
     protected void setOnPreparedListener(MediaPlayer.OnPreparedListener listener) {
-        getLocalPlayer().setOnPreparedListener(listener);
+        getExMediaPlayer().setOnPreparedListener(listener);
     }
 
     protected void setOnSeekCompleteListener(MediaPlayer.OnSeekCompleteListener listener) {
-        getLocalPlayer().setOnSeekCompleteListener(listener);
+        getExMediaPlayer().setOnSeekCompleteListener(listener);
     }
 
     protected void setOnVideoSizeChangedListener(MediaPlayer.OnVideoSizeChangedListener listener) {
-        getLocalPlayer().setOnVideoSizeChangedListener(listener);
+        getExMediaPlayer().setOnVideoSizeChangedListener(listener);
     }
 
     protected static class AllowedOperations {
@@ -372,7 +387,7 @@ public class MediaPlayerBridge {
      */
     @CalledByNative
     protected AllowedOperations getAllowedOperations() {
-        MediaPlayer player = getLocalPlayer();
+        ExMediaPlayer player = getExMediaPlayer();
         boolean canPause = true;
         boolean canSeekForward = true;
         boolean canSeekBackward = true;
@@ -409,6 +424,7 @@ public class MediaPlayerBridge {
         } catch (NoSuchFieldException e) {
             Log.e(TAG, "Cannot find matching fields in Metadata class: " + e);
         }
+        Log.e(TAG, "====getAllowedOperations ." + canPause + " " + canSeekForward + " " + canSeekBackward);
         return new AllowedOperations(canPause, canSeekForward, canSeekBackward);
     }
 

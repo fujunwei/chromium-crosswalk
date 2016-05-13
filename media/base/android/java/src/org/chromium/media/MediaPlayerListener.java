@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
+import android.util.Log;
 
 // This class implements all the listener interface for android mediaplayer.
 // Callbacks will be sent to the native class for processing.
@@ -33,6 +34,7 @@ class MediaPlayerListener implements MediaPlayer.OnPreparedListener,
     // Used to determine the class instance to dispatch the native call to.
     private long mNativeMediaPlayerListener = 0;
     private final Context mContext;
+    private String TAG = "chromium_MediaPlayerListener";
 
     private MediaPlayerListener(long nativeMediaPlayerListener, Context context) {
         mNativeMediaPlayerListener = nativeMediaPlayerListener;
@@ -41,6 +43,7 @@ class MediaPlayerListener implements MediaPlayer.OnPreparedListener,
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        Log.e(TAG, "====onError ." + what + " " + extra);
         int errorType;
         switch (what) {
             case MediaPlayer.MEDIA_ERROR_UNKNOWN:
@@ -76,26 +79,31 @@ class MediaPlayerListener implements MediaPlayer.OnPreparedListener,
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+        Log.e(TAG, "====onVideoSizeChanged ." + width + " " + height);
         nativeOnVideoSizeChanged(mNativeMediaPlayerListener, width, height);
     }
 
     @Override
     public void onSeekComplete(MediaPlayer mp) {
+        Log.e(TAG, "====onSeekComplete .");
         nativeOnSeekComplete(mNativeMediaPlayerListener);
     }
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        Log.e(TAG, "====onBufferingUpdate ." + percent);
         nativeOnBufferingUpdate(mNativeMediaPlayerListener, percent);
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        Log.e(TAG, "====onCompletion .");
         nativeOnPlaybackComplete(mNativeMediaPlayerListener);
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        Log.e(TAG, "====onPrepared .");
         nativeOnMediaPrepared(mNativeMediaPlayerListener);
     }
 

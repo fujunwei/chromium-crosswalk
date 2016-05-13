@@ -191,6 +191,8 @@ bool MediaPlayerBridge::InterceptMediaUrl(
   // Sentinel value to check whether the output arguments have been set.
   const int kUnsetValue = -1;
 
+  LOG(ERROR) << "=====in MediaPlayerBridge::InterceptMediaUrl" << url;
+
   *fd = kUnsetValue;
   *offset = kUnsetValue;
   *size = kUnsetValue;
