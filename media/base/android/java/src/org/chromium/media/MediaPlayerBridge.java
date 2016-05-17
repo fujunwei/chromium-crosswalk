@@ -35,11 +35,17 @@ import java.util.HashMap;
 */
 @JNINamespace("media")
 public class MediaPlayerBridge {
-
+    /**
+    * Give the host application a chance to take over MeidaPlayer.
+    */
     public static class ResourceLoadingFilter {
         public boolean shouldOverrideResourceLoading(
-                MediaPlayer mediaPlayer, Context context, Uri uri) {
+                ExternalMediaPlayer mediaPlayer, Context context, Uri uri) {
             return false;
+        }
+
+        public ExternalMediaPlayer getExternalMediaPlayer() {
+            return null;
         }
     }
 
@@ -54,7 +60,7 @@ public class MediaPlayerBridge {
     // Local player to forward this to. We don't initialize it here since the subclass might not
     // want it.
     private LoadDataUriTask mLoadDataUriTask;
-    private MediaPlayer mPlayer;
+    private ExternalMediaPlayer mPlayer;
     private long mNativeMediaPlayerBridge;
 
     @CalledByNative
@@ -78,9 +84,10 @@ public class MediaPlayerBridge {
         mNativeMediaPlayerBridge = 0;
     }
 
-    protected MediaPlayer getLocalPlayer() {
+    protected ExternalMediaPlayer getLocalPlayer() {
         if (mPlayer == null) {
-            mPlayer = new MediaPlayer();
+            mPlayer = sResourceLoadFilter.getExternalMediaPlayer();
+            if (mPlayer == null) mPlayer = new ExternalMediaPlayer();
         }
         return mPlayer;
     }
@@ -202,9 +209,9 @@ public class MediaPlayerBridge {
             headersMap.put("allow-cross-domain-redirect", "false");
         }
         try {
-            if (sResourceLoadFilter != null &&
-                    sResourceLoadFilter.shouldOverrideResourceLoading(
-                            getLocalPlayer(), context, uri)) {
+            if (sResourceLoadFilter != null
+                    && sResourceLoadFilter.shouldOverrideResourceLoading(
+                               getLocalPlayer(), context, uri)) {
                 return true;
             }
             getLocalPlayer().setDataSource(context, uri, headersMap);
@@ -372,7 +379,7 @@ public class MediaPlayerBridge {
      */
     @CalledByNative
     protected AllowedOperations getAllowedOperations() {
-        MediaPlayer player = getLocalPlayer();
+        ExternalMediaPlayer player = getLocalPlayer();
         boolean canPause = true;
         boolean canSeekForward = true;
         boolean canSeekBackward = true;
