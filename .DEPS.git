@@ -184,9 +184,9 @@ deps = {
     'src/third_party/jsoncpp/source/src/lib_json':
         Var('git_url') + '/external/jsoncpp/jsoncpp/src/lib_json.git@a8caa51ba2f80971a45880425bf2ae864a786784',
     'src/third_party/leveldatabase/src':
-        Var('git_url') + '/external/leveldb.git@3f77584eb3f9754bbb7079070873ece3f30a1e6b',
+        Var('git_url') + '/external/leveldb.git@e353fbc7ea81f12a5694991b708f8f45343594b1',
     'src/third_party/libaddressinput/src':
-        Var('git_url') + '/external/libaddressinput.git@945d96387a716d0d82b195fa69a5e9a701249517',
+        Var('git_url') + '/external/libaddressinput.git@895e5d5aa515d8750d247cb902c63fd75c9a4330',
     'src/third_party/libc++/trunk':
         Var('git_url') + '/chromium/llvm-project/libcxx.git@48198f9110397fff47fe7c37cbfa296be7d44d3d',
     'src/third_party/libc++abi/trunk':

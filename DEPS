@@ -311,7 +311,7 @@ deps = {
   'src/third_party/cacheinvalidation/src':
     (Var("git.chromium.org")) + '/external/google-cache-invalidation-api/src.git@c91bd9d9fed06bf440be64f87b94a2effdb32bc4',
   'src/third_party/leveldatabase/src':
-    (Var("git.chromium.org")) + '/external/leveldb.git@3f77584eb3f9754bbb7079070873ece3f30a1e6b',
+    (Var("git.chromium.org")) + '/external/leveldb.git@e353fbc7ea81f12a5694991b708f8f45343594b1',
   'build':
     '/trunk/tools/build@292166',
   'src/tools/gyp':
@@ -331,7 +331,7 @@ deps = {
   'src/third_party/webdriver/pylib':
     (Var("git.chromium.org")) + '/external/selenium/py.git@5fd78261a75fe08d27ca4835fb6c5ce4b42275bd',
   'src/third_party/libaddressinput/src':
-    (Var("git.chromium.org")) + '/external/libaddressinput.git@945d96387a716d0d82b195fa69a5e9a701249517',
+    (Var("git.chromium.org")) + '/external/libaddressinput.git@895e5d5aa515d8750d247cb902c63fd75c9a4330',
   'build/scripts/gsd_generate_index':
     '/trunk/tools/gsd_generate_index@164784',
   'src/chrome/browser/resources/pdf/html_office':
